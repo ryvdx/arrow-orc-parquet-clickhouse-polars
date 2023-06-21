@@ -22,7 +22,7 @@ ORC, Parque, Arrow, Database binaries for ELT, and Polars
 
 ## Where to got the source Data?
 Download the US ASCII Daily historical file from Stooq.com, place in ./raw-data folder
-https://stooq.com/db/d/?b=d_us_txt
+https://stooq.com/db/h/
 Unzip that in the ./raw-data folder
 
 ## Notes
