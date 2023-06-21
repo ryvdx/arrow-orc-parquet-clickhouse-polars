@@ -1,0 +1,72 @@
+---
+version: '3.4'
+
+volumes:
+  clickhousedb:
+  clickhouselogs:
+  portainerdata:
+
+services:
+
+  portainer:
+    image: portainer/portainer-ce:linux-arm64-2.17.0
+    container_name: portainer
+    platform: linux/arm64
+    restart: unless-stopped
+    command: --admin-password '$$2y$$10$$AhumqW5TQz5cXDC40aOCIekzWDlTbG2RPqzD/dsT6OYWJ9zzEbYzy'
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - portainerdata:/data
+    ports:
+      - 8081:9000
+    networks:
+      - datapocnetwork
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:22.9.7.34-alpine
+    container_name: clickhouse
+    restart: unless-stopped
+    platform: linux/arm64
+    hostname: clickhouse
+    environment:
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB}
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+    ports:
+      - 8123:8123
+      - 9000:9000
+      - 9009:9009
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes: 
+      - clickhousedb:/var/lib/clickhouse/
+      - clickhouselogs:/var/log/clickhouse-server/
+      - ./raw-data:/var/lib/clickhouse/user_files/incoming-data
+      - ./shared-datasets:/var/lib/clickhouse/user_files/shared-datasets
+    networks:
+      - datapocnetwork
+
+  jupyter:
+    image: jupyter/scipy-notebook:notebook-6.5.4
+    restart: unless-stopped
+    container_name: jupyter
+    ports:
+      - 8888:8888
+    environment:
+      JUPYTER_TOKEN: easy
+    volumes:
+      - ./jupyter-notebooks:/home/jovyan/work/notebooks
+      - ./shared-datasets:/home/jovyan/work/shared-datasets
+      - ./raw-data:/home/jovyan/work/raw-data
+    networks:
+      - datapocnetwork
+
+networks:
+  datapocnetwork:
+    name: datapocnetwork
