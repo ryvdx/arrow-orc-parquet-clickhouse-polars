@@ -1,6 +1,9 @@
 # arrow-orc-parquet-clickhouse-polars
 Git repo to complement the YouTube video:
-ORC, Parque, Arrow, Database binaries for ELT, and Polars
+ORC, Parque, Arrow
+Database binaries for ELT
+SQL Abstraction of files on disk or object storage
+Polars as Pandas replacement
 
 ## Why?
 - save money on managed cloud services like AWS Lambda, ECR, S3 (Replace Pandas for Polars)
